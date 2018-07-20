@@ -3,6 +3,22 @@
 
 function normalize(v) = v / (sqrt(v[0] * v[0] + v[1] * v[1]));
 
+//
+// The voronoi() function generates a 2D surface, which can be provided to
+// a) linear_extrude() to produce a 3D object
+// b) intersection() to restrict it to a a specified shape -- see voronoi_polygon.scad
+//
+// Parameters:
+//   points (required) ... nuclei coordinates (array of [x, y] pairs)
+//   L                 ... the radius of the "world" (the pattern is built within this circle)
+//   thickness         ... the thickness of the lines between cells
+//   round             ... the radius applied to corners (fillet in CAD terms)
+//   nuclei (bool)     ... show nuclei sites
+//
+// These parameters need to be kept more or less in proportion to each other, and to the distance
+// apart of points in the point_set. If one or the other parameter is increased or decreased too
+// much, you'll get no output.
+//
 module voronoi(points, L = 200, thickness = 1, round = 6, nuclei = true) {
 	for (p = points) {
 		difference() {
@@ -25,6 +41,22 @@ module voronoi(points, L = 200, thickness = 1, round = 6, nuclei = true) {
 	}
 }
 
+//
+// The random_voronoi() function is the helper wrapper over the voronoi() core.
+// It generates random nuclei site coordinates into the square area,
+// passing other arguments to voronoi() unchanged.
+//
+// Parameters:
+//   n                 ... number of nuclei sites to be generated
+//   nuclei (bool)     ... show nuclei sites
+//   L                 ... the radius of the "world" (the pattern is built within this circle)
+//   thickness         ... the thickness of the lines between cells
+//   round             ... the radius applied to corners (fillet in CAD terms)
+//   min               ... minimum x and y coordinate for nuclei generation
+//   max               ... maximum x and y coordinate for nuclei generation
+//   seed              ... seed for the random generator (random if undefined)
+//   center (bool)     ... move resulting pattern to [0, 0] if true
+//
 module random_voronoi(n = 20, nuclei = true, L = 200, thickness = 1, round = 6, min = 0, max = 100, seed = undef, center = false) {
 	seed = seed == undef ? rands(0, 100, 1)[0] : seed;
 	echo("Seed", seed);
